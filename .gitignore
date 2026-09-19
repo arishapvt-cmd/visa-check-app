@@ -1,0 +1,38 @@
+# Node & Next.js
+node_modules/
+**/node_modules/
+.next/
+**/.next/
+visacheckapp/out/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Android / Gradle
+.gradle/
+**/.gradle/
+build/
+**/build/
+!VisaCheckAndroid/app/build.gradle.kts
+local.properties
+*.apk
+*.aab
+*.hprof
+.cxx/
+**/captures/
+
+# IDE & OS
+.DS_Store
+**/.DS_Store
+.idea/
+**/.idea/
+*.iml
+*.swp
+*.swo
+.vscode/
+
+# Logs & temp
+*.log
+scratch/
+tmp/

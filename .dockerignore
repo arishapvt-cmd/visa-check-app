@@ -1,0 +1,9 @@
+node_modules
+.next
+out
+.git
+.gradle
+build
+VisaCheckAndroid
+*.log
+.DS_Store

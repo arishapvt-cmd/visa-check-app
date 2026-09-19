@@ -1,0 +1,3 @@
+:HL["/_next/static/chunks/1s7v2aopi4w9_.css","style"]
+:HL["https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Syne:wght@400..800&family=Hind+Siliguri:wght@300;400;500;600;700&display=swap","style"]
+0:{"tree":{"name":"","param":null,"prefetchHints":4176,"slots":{"children":{"name":"countries","param":null,"prefetchHints":4192,"slots":{"children":{"name":"countryId","param":{"type":"d","key":"south-korea","siblings":[]},"prefetchHints":4192,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}}}},"staleTime":300,"buildId":"z0-nMbMPTylgxzgvI47sH"}

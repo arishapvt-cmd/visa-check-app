@@ -1,0 +1,21 @@
+<resources>
+    <!-- Base theme — no action bar, fullscreen -->
+    <style name="Theme.VisaCheckApp" parent="Theme.SplashScreen">
+        <!-- SplashScreen API: icon shown on the system-level splash -->
+        <item name="windowSplashScreenBackground">#020817</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_round</item>
+        <item name="windowSplashScreenAnimationDuration">300</item>
+        <!-- The theme to apply AFTER the splash is dismissed -->
+        <item name="postSplashScreenTheme">@style/Theme.VisaCheckApp.Main</item>
+    </style>
+
+    <!-- Main app theme applied after splash -->
+    <style name="Theme.VisaCheckApp.Main" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@color/bg_dark</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="colorPrimary">@color/primary</item>
+    </style>
+</resources>
