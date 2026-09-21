@@ -94,25 +94,26 @@ fun SplashScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(animatedBgColor),
-        contentAlignment = Alignment.Center
+            .background(animatedBgColor)
     ) {
-        // ── Center Content: Logo + Wordmark + Loader ──
+        // ── 1. Centered Brand Logo — Locked to exact screen center (matches Phase 1 288dp canvas) ──
+        Image(
+            painter = painterResource(id = R.drawable.splash_icon),
+            contentDescription = "Visa Check App Logo",
+            modifier = Modifier
+                .size(288.dp)
+                .align(Alignment.Center)
+        )
+
+        // ── 2. Wordmark + Circular Loader — Anchored gracefully below the centered shield ──
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(horizontal = 24.dp)
+            modifier = Modifier
+                .align(Alignment.Center)
+                .offset(y = 188.dp)
+                .padding(horizontal = 24.dp)
         ) {
-            // App Logo Icon (centered, launcher icon size ~96dp)
-            Image(
-                painter = painterResource(id = R.drawable.visa_check_logo),
-                contentDescription = "Visa Check App Logo",
-                modifier = Modifier.size(96.dp)
-            )
-
-            Spacer(modifier = Modifier.height(18.dp))
-
-            // ── Phase 3+: Branded Wordmark ──
+            // Phase 3+: Branded Wordmark
             AnimatedVisibility(
                 visible = phase != SplashPhase.PHASE_2_PLAIN_HOLD,
                 enter = fadeIn(animationSpec = tween(400)),
@@ -137,9 +138,9 @@ fun SplashScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
-            // ── Phase 4: Circular 5-Dot Wave Loader ──
+            // Phase 4: Circular 5-Dot Wave Loader
             AnimatedVisibility(
                 visible = phase == SplashPhase.PHASE_4_DOT_LOADER,
                 enter = fadeIn(animationSpec = tween(300)),
@@ -167,9 +168,9 @@ fun SplashScreen(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.visa_check_logo),
+                        painter = painterResource(id = R.drawable.splash_icon),
                         contentDescription = null,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(20.dp)
                     )
                     Text(
                         text = "  VisaCheckApp",
