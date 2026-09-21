@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { X, QrCode, Camera, Upload, CheckCircle2, Copy, ExternalLink, AlertCircle } from "lucide-react";
 import { playSweetTune } from "@/lib/sound";
 import ToolGuideCards, { ToolGuideItem } from "./ToolGuideCards";
+import ToolModalFooter from "./ToolModalFooter";
 
 interface VisaQRScannerModalProps {
   isOpen: boolean;
@@ -227,179 +228,202 @@ export default function VisaQRScannerModal({ isOpen, onClose }: VisaQRScannerMod
         </button>
       </header>
 
-      {/* ─── Body (Scrollable, 100% full screen responsive) ─── */}
-      <main className="p-4 overflow-y-auto space-y-4 flex-1 scrollbar-none">
-        {/* Camera Viewfinder Box */}
-        <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-black/60 border border-white/10 flex flex-col items-center justify-center shadow-inner">
-          <video
-            ref={videoRef}
-            playsInline
-            muted
-            className={`w-full h-full object-cover ${isScanning ? "block" : "hidden"}`}
-          />
-
-          {isScanning ? (
-            <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-              <div className="w-[70%] h-[70%] border-2 border-[#38bdf8] rounded-2xl relative shadow-[0_0_20px_rgba(56,189,248,0.4)]">
-                <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-[#38bdf8]" />
-                <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-[#38bdf8]" />
-                <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-[#38bdf8]" />
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-[#38bdf8]" />
-
-                <motion.div
-                  animate={{ y: [0, 160, 0] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                  className="w-full h-0.5 bg-gradient-to-r from-transparent via-[#38bdf8] to-transparent shadow-[0_0_8px_#38bdf8]"
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center p-6 text-center space-y-3">
-              <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-[#38bdf8]">
-                <Camera className="w-8 h-8" />
-              </div>
-              <div>
-                <h4 className="font-bold text-sm text-white" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
-                  ক্যামেরা স্ক্যানার চালু করুন
-                </h4>
-                <p className="text-xs text-[#A0AEC0] max-w-xs mt-0.5">
-                  ভিসার পাতার কিউআর কোডের ওপর ক্যামেরা ধরুন
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={startCamera}
-                className="px-5 py-2.5 rounded-xl text-xs font-bold text-white shadow-md active:scale-95 transition-transform"
-                style={{
-                  background: "linear-gradient(135deg, #0284c7 0%, #38bdf8 100%)",
-                  fontFamily: "'Hind Siliguri', sans-serif",
-                }}
-              >
-                ক্যামেরা ওপেন করুন
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Error Message */}
-        {errorMsg && (
-          <div className="p-3 rounded-xl bg-[#ef4444]/15 border border-[#ef4444]/30 flex items-start gap-2 text-xs text-[#fca5a5]">
-            <AlertCircle className="w-4 h-4 text-[#ef4444] shrink-0 mt-0.5" />
-            <span>{errorMsg}</span>
-          </div>
-        )}
-
-        {/* Alternative: Image File Upload */}
-        <div className="flex items-center justify-between p-3.5 rounded-xl bg-white/[0.04] border border-white/10">
-          <div>
-            <span className="text-xs font-bold text-[#E2E8F0] block" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
-              ছবি বা ফাইল থেকে স্ক্যান করতে চান?
-            </span>
-            <span className="text-[11px] text-[#A0AEC0]">
-              গ্যালারি থেকে ভিসার ছবি বা স্ক্রিনশট নির্বাচন করুন
-            </span>
-          </div>
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileUpload}
-            className="hidden"
-          />
-
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-[#38bdf8] flex items-center gap-1.5 active:scale-95 transition-all"
-            style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
+      {/* ─── Body (Scrollable, 100% full screen auto-responsive with 2 3D Cards) ─── */}
+      <main className="flex-1 overflow-y-auto p-3 sm:p-3.5 scrollbar-none flex flex-col">
+        <div className="min-h-full flex flex-col justify-between gap-3 sm:gap-3.5 flex-1">
+          {/* ══════════════════════════════════════════════════════════
+              ═══ 3D PREMIUM CARD 1: FULL TOOL SECTION (INTERACTIVE) ═══
+              ══════════════════════════════════════════════════════════ */}
+          <div
+            className="w-full rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 border flex flex-col justify-between transition-all select-none space-y-3"
+            style={{
+              background: "linear-gradient(145deg, rgba(20, 29, 54, 0.90) 0%, rgba(10, 16, 32, 0.96) 100%)",
+              borderColor: "rgba(56, 189, 248, 0.35)",
+              boxShadow: "0 10px 32px rgba(0, 0, 0, 0.50), inset 0 1px 1px rgba(255, 255, 255, 0.12)",
+              backdropFilter: "blur(16px)",
+            }}
           >
-            <Upload className="w-3.5 h-3.5" />
-            <span>ছবি আপলোড</span>
-          </button>
-        </div>
-
-        {/* Scanned Result Card */}
-        {scannedResult && (
-          <div className="p-4 rounded-2xl bg-white/5 border border-[#10b981]/40 shadow-lg space-y-2.5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 text-[#10b981] text-xs font-bold">
-                <CheckCircle2 className="w-4 h-4" />
-                <span>কিউআর কোড স্ক্যান সফল হয়েছে:</span>
+            {/* Card 1 Top Bar */}
+            <div className="flex items-center justify-between pb-2 border-b border-white/10 shrink-0">
+              <div className="flex items-center gap-2">
+                <QrCode className="w-4 h-4 text-[#38bdf8] shrink-0" />
+                <h4
+                  className="text-xs sm:text-sm font-bold text-[#F1EAD9] tracking-wide"
+                  style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
+                >
+                  ভিসা কিউআর ও বারকোড স্ক্যানার
+                </h4>
               </div>
-              {copied && (
-                <span className="text-[10.5px] text-[#10b981] font-semibold">
-                  কপি হয়েছে!
-                </span>
-              )}
-            </div>
-
-            <div className="p-3 rounded-xl bg-black/40 border border-white/10 font-mono text-xs text-[#E2E8F0] break-all select-all">
-              {scannedResult}
-            </div>
-
-            <div className="flex items-center gap-2 pt-1">
-              <button
-                type="button"
-                onClick={handleCopy}
-                className="flex-1 py-2 px-3 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-bold text-white flex items-center justify-center gap-1.5"
+              <span
+                className="text-[10px] font-bold px-2.5 py-0.5 rounded-full border bg-[rgba(56,189,248,0.15)] border-[#38bdf8] text-[#7dd3fc]"
                 style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
               >
-                <Copy className="w-3.5 h-3.5" />
-                <span>তথ্য কপি করুন</span>
-              </button>
+                ডিজিটাল যাচাই
+              </span>
+            </div>
 
-              {isUrl && (
-                <a
-                  href={scannedResult}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 py-2 px-3 rounded-xl text-xs font-bold text-[#1B2340] flex items-center justify-center gap-1.5"
-                  style={{
-                    background: "linear-gradient(135deg, #F3D89B 0%, #D9B15C 100%)",
-                    fontFamily: "'Hind Siliguri', sans-serif",
-                  }}
-                >
-                  <span>পোর্টাল ওপেন করুন</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
+            {/* Camera Viewfinder Box */}
+            <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-black/60 border border-white/10 flex flex-col items-center justify-center shadow-inner">
+              <video
+                ref={videoRef}
+                playsInline
+                muted
+                className={`w-full h-full object-cover ${isScanning ? "block" : "hidden"}`}
+              />
+
+              {isScanning ? (
+                <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                  <div className="w-[70%] h-[70%] border-2 border-[#38bdf8] rounded-2xl relative shadow-[0_0_20px_rgba(56,189,248,0.4)]">
+                    <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-[#38bdf8]" />
+                    <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-[#38bdf8]" />
+                    <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-[#38bdf8]" />
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-[#38bdf8]" />
+
+                    <motion.div
+                      animate={{ y: [0, 140, 0] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                      className="w-full h-0.5 bg-gradient-to-r from-transparent via-[#38bdf8] to-transparent shadow-[0_0_8px_#38bdf8]"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center p-5 text-center space-y-2.5">
+                  <div className="w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-[#38bdf8]">
+                    <Camera className="w-7 h-7" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-white" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
+                      ক্যামেরা স্ক্যানার চালু করুন
+                    </h4>
+                    <p className="text-[11px] text-[#A0AEC0] max-w-xs mt-0.5">
+                      ভিসার পাতার কিউআর কোডের ওপর ক্যামেরা ধরুন
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={startCamera}
+                    className="px-4 py-2 rounded-xl text-xs font-bold text-white shadow-md active:scale-95 transition-transform"
+                    style={{
+                      background: "linear-gradient(135deg, #0284c7 0%, #38bdf8 100%)",
+                      fontFamily: "'Hind Siliguri', sans-serif",
+                    }}
+                  >
+                    ক্যামেরা ওপেন করুন
+                  </button>
+                </div>
               )}
             </div>
-          </div>
-        )}
 
-        {/* ─── NEW: কী? কেন? কীভাবে? Interactive 3 Cards Section with In-Viewport Zoom ─── */}
-        <ToolGuideCards
-          sectionTitle="কিউআর কোড ভেরিফিকেশন নির্দেশিকা (কী? কেন? কীভাবে?)"
-          subtitle="আসল বনাম জাল ভিসা শনাক্তকরণ ও ডিজিটাল কোডের তথ্যাবলি"
-          theme="sky"
-          items={QR_GUIDE_ITEMS}
-        />
+            {/* Error Message */}
+            {errorMsg && (
+              <div className="p-2.5 rounded-xl bg-[#ef4444]/15 border border-[#ef4444]/30 flex items-start gap-2 text-xs text-[#fca5a5]">
+                <AlertCircle className="w-4 h-4 text-[#ef4444] shrink-0 mt-0.5" />
+                <span>{errorMsg}</span>
+              </div>
+            )}
+
+            {/* Alternative: Image File Upload */}
+            <div className="flex items-center justify-between p-3 rounded-xl bg-white/[0.04] border border-white/10">
+              <div>
+                <span className="text-xs font-bold text-[#E2E8F0] block" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
+                  ছবি বা ফাইল থেকে স্ক্যান করতে চান?
+                </span>
+                <span className="text-[10.5px] text-[#A0AEC0]">
+                  গ্যালারি থেকে ভিসার ছবি বা স্ক্রিনশট নির্বাচন করুন
+                </span>
+              </div>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-[#38bdf8] flex items-center gap-1.5 active:scale-95 transition-all"
+                style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
+              >
+                <Upload className="w-3.5 h-3.5" />
+                <span>ছবি আপলোড</span>
+              </button>
+            </div>
+
+            {/* Scanned Result Card */}
+            {scannedResult && (
+              <div className="p-3.5 rounded-2xl bg-white/5 border border-[#10b981]/40 shadow-lg space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-[#10b981] text-xs font-bold">
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>কিউআর কোড স্ক্যান সফল হয়েছে:</span>
+                  </div>
+                  {copied && (
+                    <span className="text-[10.5px] text-[#10b981] font-semibold">
+                      কপি হয়েছে!
+                    </span>
+                  )}
+                </div>
+
+                <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 font-mono text-xs text-[#E2E8F0] break-all select-all">
+                  {scannedResult}
+                </div>
+
+                <div className="flex items-center gap-2 pt-0.5">
+                  <button
+                    type="button"
+                    onClick={handleCopy}
+                    className="flex-1 py-1.5 px-3 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-bold text-white flex items-center justify-center gap-1.5"
+                    style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>তথ্য কপি করুন</span>
+                  </button>
+
+                  {isUrl && (
+                    <a
+                      href={scannedResult}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 py-1.5 px-3 rounded-xl text-xs font-bold text-[#1B2340] flex items-center justify-center gap-1.5"
+                      style={{
+                        background: "linear-gradient(135deg, #F3D89B 0%, #D9B15C 100%)",
+                        fontFamily: "'Hind Siliguri', sans-serif",
+                      }}
+                    >
+                      <span>পোর্টাল ওপেন করুন</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* ══════════════════════════════════════════════════════════
+              ═══ 3D PREMIUM CARD 2: TOOL GUIDE CARDS (কী? কেন? কীভাবে?) ═══
+              ══════════════════════════════════════════════════════════ */}
+          <ToolGuideCards
+            sectionTitle="কিউআর কোড ভেরিফিকেশন নির্দেশিকা (কী? কেন? কীভাবে?)"
+            subtitle="আসল বনাম জাল ভিসা শনাক্তকরণ ও ডিজিটাল কোডের তথ্যাবলি"
+            theme="sky"
+            items={QR_GUIDE_ITEMS}
+            className="w-full flex-1"
+          />
+        </div>
       </main>
 
-      {/* ─── Footer Action ─── */}
-      <footer
-        className="p-3.5 border-t border-white/10 bg-[#090d1a]/95 backdrop-blur-md shrink-0"
-        style={{
-          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 14px)",
+      {/* ─── Sticky Footer with Attached Copyright Trust Bar ─── */}
+      <ToolModalFooter
+        onClose={() => {
+          stopCamera();
+          onClose();
         }}
-      >
-        <button
-          type="button"
-          onClick={() => {
-            playSweetTune();
-            stopCamera();
-            onClose();
-          }}
-          className="w-full py-2.5 rounded-xl text-xs font-bold text-[#1B2340] shadow-md active:scale-[0.98] transition-transform"
-          style={{
-            background: "linear-gradient(135deg, #F3D89B 0%, #D9B15C 100%)",
-            fontFamily: "'Hind Siliguri', sans-serif",
-          }}
-        >
-          সম্পন্ন করুন
-        </button>
-      </footer>
+        btnGradient="linear-gradient(135deg, #0284c7 0%, #38bdf8 100%)"
+        btnTextColor="#FFFFFF"
+      />
     </div>,
     document.body
   );

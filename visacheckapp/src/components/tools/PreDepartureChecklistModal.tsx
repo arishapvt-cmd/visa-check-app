@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { X, CheckSquare, RotateCcw, CheckCircle2, ShieldCheck, Plane, FileCheck, Sparkles } from "lucide-react";
 import { playSweetTune } from "@/lib/sound";
 import ToolGuideCards, { ToolGuideItem } from "./ToolGuideCards";
+import ToolModalFooter from "./ToolModalFooter";
 
 interface PreDepartureChecklistModalProps {
   isOpen: boolean;
@@ -288,141 +289,162 @@ export default function PreDepartureChecklistModal({ isOpen, onClose }: PreDepar
         </button>
       </header>
 
-      {/* ─── Progress Banner ─── */}
-      <div className="px-4 py-3 bg-white/[0.04] border-b border-white/10 flex items-center justify-between gap-4 shrink-0">
-        <div className="flex-1">
-          <div className="flex items-center justify-between text-xs font-bold mb-1.5">
-            <span className="text-[#F3D89B]" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
-              যাত্রার প্রস্তুতি: {completedCount}/{DEFAULT_CHECKLIST_ITEMS.length} সম্পন্ন
-            </span>
-            <span className="text-[#10b981]">{percentage}% প্রস্তুত</span>
-          </div>
-          <div className="w-full h-2 rounded-full bg-black/40 overflow-hidden">
-            <motion.div
-              className="h-full rounded-full"
-              style={{
-                background: "linear-gradient(90deg, #10b981 0%, #D9B15C 100%)",
-              }}
-              animate={{ width: `${percentage}%` }}
-              transition={{ duration: 0.3 }}
-            />
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={handleReset}
-          title="চেকলিস্ট রিসেট করুন"
-          className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-[#A0AEC0] hover:text-[#f87171] transition-colors shrink-0"
-        >
-          <RotateCcw className="w-4 h-4" />
-        </button>
-      </div>
-
-      {/* ─── Body with Category Groups (Scrollable, 100% full screen) ─── */}
-      <main className="p-4 overflow-y-auto space-y-4 flex-1 scrollbar-none">
-        {["passport_visa", "clearance_medical", "travel_tickets", "personal"].map((catKey) => {
-          const items = DEFAULT_CHECKLIST_ITEMS.filter((i) => i.category === catKey);
-          const catTitle = items[0]?.categoryTitleBn || "";
-
-          return (
-            <div key={catKey} className="space-y-2">
-              <h4
-                className="text-xs font-extrabold text-[#D9B15C] flex items-center gap-1.5"
+      {/* ─── Body (Scrollable, 100% full screen auto-responsive with 2 3D Cards) ─── */}
+      <main className="flex-1 overflow-y-auto p-3 sm:p-3.5 scrollbar-none flex flex-col">
+        <div className="min-h-full flex flex-col justify-between gap-3 sm:gap-3.5 flex-1">
+          {/* ══════════════════════════════════════════════════════════
+              ═══ 3D PREMIUM CARD 1: FULL TOOL SECTION (INTERACTIVE) ═══
+              ══════════════════════════════════════════════════════════ */}
+          <div
+            className="w-full rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 border flex flex-col justify-between transition-all select-none space-y-3"
+            style={{
+              background: "linear-gradient(145deg, rgba(20, 29, 54, 0.90) 0%, rgba(10, 16, 32, 0.96) 100%)",
+              borderColor: "rgba(245, 158, 11, 0.35)",
+              boxShadow: "0 10px 32px rgba(0, 0, 0, 0.50), inset 0 1px 1px rgba(255, 255, 255, 0.12)",
+              backdropFilter: "blur(16px)",
+            }}
+          >
+            {/* Card 1 Top Bar */}
+            <div className="flex items-center justify-between pb-2 border-b border-white/10 shrink-0">
+              <div className="flex items-center gap-2">
+                <CheckSquare className="w-4 h-4 text-[#f59e0b] shrink-0" />
+                <h4
+                  className="text-xs sm:text-sm font-bold text-[#F1EAD9] tracking-wide"
+                  style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
+                >
+                  বিদেশযাত্রার ডিজিটাল চেকলিস্ট
+                </h4>
+              </div>
+              <span
+                className="text-[10px] font-bold px-2.5 py-0.5 rounded-full border bg-[rgba(245,158,11,0.15)] border-[#f59e0b] text-[#fbbf24]"
                 style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
               >
-                {catKey === "passport_visa" && <FileCheck className="w-3.5 h-3.5" />}
-                {catKey === "clearance_medical" && <ShieldCheck className="w-3.5 h-3.5" />}
-                {catKey === "travel_tickets" && <Plane className="w-3.5 h-3.5" />}
-                {catKey === "personal" && <Sparkles className="w-3.5 h-3.5" />}
-                <span>{catTitle}</span>
-              </h4>
-
-              <div className="space-y-2">
-                {items.map((item) => {
-                  const isChecked = !!checkedMap[item.id];
-                  return (
-                    <div
-                      key={item.id}
-                      onClick={() => handleToggle(item.id)}
-                      className={`p-3 rounded-2xl border transition-all duration-200 cursor-pointer select-none flex items-start gap-3 ${
-                        isChecked
-                          ? "bg-[#10b981]/10 border-[#10b981]/30 opacity-70"
-                          : "bg-white/[0.04] border-white/10 hover:border-white/20 active:scale-[0.99]"
-                      }`}
-                    >
-                      <div className="mt-0.5 shrink-0">
-                        {isChecked ? (
-                          <div className="w-5 h-5 rounded-lg bg-[#10b981] flex items-center justify-center text-black">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-black stroke-[3]" />
-                          </div>
-                        ) : (
-                          <div className="w-5 h-5 rounded-lg border-2 border-[#D9B15C]/60 bg-black/20" />
-                        )}
-                      </div>
-
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`text-xs font-bold leading-snug ${
-                              isChecked ? "text-[#E2E8F0] line-through opacity-80" : "text-white"
-                            }`}
-                            style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
-                          >
-                            {item.titleBn}
-                          </span>
-                          {item.isCrucial && (
-                            <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-[#ef4444]/20 text-[#f87171] border border-[#ef4444]/30 shrink-0">
-                              বাধ্যতামূলক
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-[11px] text-[#94A3B8] leading-tight mt-0.5">
-                          {item.descBn}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                ইমিগ্রেশন প্রস্তুতি
+              </span>
             </div>
-          );
-        })}
 
-        {/* ─── NEW: কী? কেন? কীভাবে? Interactive 3 Cards Section with In-Viewport Zoom ─── */}
-        <ToolGuideCards
-          sectionTitle="ভ্রমণ নির্দেশিকা (কী? কেন? কীভাবে?)"
-          subtitle="অফলোড প্রতিরোধ, বিএমইটি সুরক্ষা ও কাস্টমস নিয়মের পূর্ণাঙ্গ গাইডলাইন"
-          theme="amber"
-          items={CHECKLIST_GUIDE_ITEMS}
-        />
+            {/* Progress Bar inside Card 1 */}
+            <div className="p-3 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-between gap-3">
+              <div className="flex-1">
+                <div className="flex items-center justify-between text-[11.5px] font-bold mb-1">
+                  <span className="text-[#F3D89B]" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
+                    যাত্রার প্রস্তুতি: {completedCount}/{DEFAULT_CHECKLIST_ITEMS.length} সম্পন্ন
+                  </span>
+                  <span className="text-[#10b981]">{percentage}% প্রস্তুত</span>
+                </div>
+                <div className="w-full h-2 rounded-full bg-black/40 overflow-hidden">
+                  <motion.div
+                    className="h-full rounded-full"
+                    style={{
+                      background: "linear-gradient(90deg, #10b981 0%, #D9B15C 100%)",
+                    }}
+                    animate={{ width: `${percentage}%` }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleReset}
+                title="চেকলিস্ট রিসেট করুন"
+                className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[#A0AEC0] hover:text-[#f87171] transition-colors shrink-0"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Category Groups */}
+            <div className="space-y-3">
+              {["passport_visa", "clearance_medical", "travel_tickets", "personal"].map((catKey) => {
+                const items = DEFAULT_CHECKLIST_ITEMS.filter((i) => i.category === catKey);
+                const catTitle = items[0]?.categoryTitleBn || "";
+
+                return (
+                  <div key={catKey} className="space-y-1.5">
+                    <h5
+                      className="text-[11.5px] font-bold text-[#D9B15C] flex items-center gap-1.5"
+                      style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
+                    >
+                      {catKey === "passport_visa" && <FileCheck className="w-3 h-3" />}
+                      {catKey === "clearance_medical" && <ShieldCheck className="w-3 h-3" />}
+                      {catKey === "travel_tickets" && <Plane className="w-3 h-3" />}
+                      {catKey === "personal" && <Sparkles className="w-3 h-3" />}
+                      <span>{catTitle}</span>
+                    </h5>
+
+                    <div className="space-y-1.5">
+                      {items.map((item) => {
+                        const isChecked = !!checkedMap[item.id];
+                        return (
+                          <div
+                            key={item.id}
+                            onClick={() => handleToggle(item.id)}
+                            className={`p-2.5 rounded-xl border transition-all duration-200 cursor-pointer select-none flex items-start gap-2.5 ${
+                              isChecked
+                                ? "bg-[#10b981]/10 border-[#10b981]/30 opacity-70"
+                                : "bg-white/[0.04] border-white/10 hover:border-white/20 active:scale-[0.99]"
+                            }`}
+                          >
+                            <div className="mt-0.5 shrink-0">
+                              {isChecked ? (
+                                <div className="w-4.5 h-4.5 rounded-md bg-[#10b981] flex items-center justify-center text-black">
+                                  <CheckCircle2 className="w-3 h-3 text-black stroke-[3]" />
+                                </div>
+                              ) : (
+                                <div className="w-4.5 h-4.5 rounded-md border-2 border-[#D9B15C]/60 bg-black/20" />
+                              )}
+                            </div>
+
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <span
+                                  className={`text-xs font-bold leading-snug ${
+                                    isChecked ? "text-[#E2E8F0] line-through opacity-80" : "text-white"
+                                  }`}
+                                  style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
+                                >
+                                  {item.titleBn}
+                                </span>
+                                {item.isCrucial && (
+                                  <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-[#ef4444]/20 text-[#f87171] border border-[#ef4444]/30 shrink-0">
+                                    বাধ্যতামূলক
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[10.5px] text-[#94A3B8] leading-tight mt-0.5">
+                                {item.descBn}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ══════════════════════════════════════════════════════════
+              ═══ 3D PREMIUM CARD 2: TOOL GUIDE CARDS (কী? কেন? কীভাবে?) ═══
+              ══════════════════════════════════════════════════════════ */}
+          <ToolGuideCards
+            sectionTitle="ভ্রমণ নির্দেশিকা (কী? কেন? কীভাবে?)"
+            subtitle="অফলোড প্রতিরোধ, বিএমইটি সুরক্ষা ও কাস্টমস নিয়মের পূর্ণাঙ্গ গাইডলাইন"
+            theme="amber"
+            items={CHECKLIST_GUIDE_ITEMS}
+            className="w-full flex-1"
+          />
+        </div>
       </main>
 
-      {/* ─── Footer Action ─── */}
-      <footer
-        className="p-3.5 border-t border-white/10 bg-[#090d1a]/95 backdrop-blur-md flex items-center justify-between shrink-0 gap-2"
-        style={{
-          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 14px)",
-        }}
-      >
-        <span className="text-[11px] text-[#A0AEC0]" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
-          * তথ্যগুলো আপনার ফোনে স্বয়ংক্রিয়ভাবে সংরক্ষিত থাকে।
-        </span>
-        <button
-          type="button"
-          onClick={() => {
-            playSweetTune();
-            onClose();
-          }}
-          className="px-5 py-2.5 rounded-xl text-xs font-bold text-[#1B2340] shrink-0 shadow-md active:scale-[0.98] transition-transform"
-          style={{
-            background: "linear-gradient(135deg, #F3D89B 0%, #D9B15C 100%)",
-            fontFamily: "'Hind Siliguri', sans-serif",
-          }}
-        >
-          সম্পন্ন করুন
-        </button>
-      </footer>
+      {/* ─── Sticky Footer with Attached Copyright Trust Bar ─── */}
+      <ToolModalFooter
+        onClose={onClose}
+        btnGradient="linear-gradient(135deg, #fbbf24 0%, #d97706 100%)"
+        btnTextColor="#1E1B18"
+      />
     </div>,
     document.body
   );

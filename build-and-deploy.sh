@@ -27,11 +27,7 @@ echo "✅ Next.js build complete"
 echo "📋 Step 2: Copying assets..."
 rm -rf "$ASSETS_DIR"
 mkdir -p "$ASSETS_DIR"
-rsync -a --exclude='_next' "$NEXTJS_DIR/out/" "$ASSETS_DIR/"
-
-# CRITICAL FIX: _next → next_files
-mkdir -p "$ASSETS_DIR/next_files"
-cp -r "$NEXTJS_DIR/out/_next/." "$ASSETS_DIR/next_files/"
+rsync -a "$NEXTJS_DIR/out/" "$ASSETS_DIR/"
 CHUNKS=$(ls "$ASSETS_DIR/next_files/static/chunks/" 2>/dev/null | wc -l | tr -d ' ')
 echo "✅ Assets copied ($CHUNKS JS chunks in next_files)"
 

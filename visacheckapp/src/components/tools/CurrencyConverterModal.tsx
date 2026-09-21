@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { X, ArrowRightLeft, Sparkles, AlertCircle } from "lucide-react";
 import { playSweetTune } from "@/lib/sound";
 import ToolGuideCards, { ToolGuideItem } from "./ToolGuideCards";
+import ToolModalFooter from "./ToolModalFooter";
 
 interface CurrencyConverterModalProps {
   isOpen: boolean;
@@ -157,193 +158,214 @@ export default function CurrencyConverterModal({ isOpen, onClose }: CurrencyConv
         </button>
       </header>
 
-      {/* ─── Body (Scrollable, 100% full screen responsive) ─── */}
-      <main className="p-4 overflow-y-auto space-y-4 flex-1 scrollbar-none">
-        {/* Quick Currency Selector Grid */}
-        <div>
-          <label
-            className="block text-xs font-bold text-[#E2E8F0] mb-1.5"
-            style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
+      {/* ─── Body (Scrollable, 100% full screen auto-responsive with 2 3D Cards) ─── */}
+      <main className="flex-1 overflow-y-auto p-3 sm:p-3.5 scrollbar-none flex flex-col">
+        <div className="min-h-full flex flex-col justify-between gap-3 sm:gap-3.5 flex-1">
+          {/* ══════════════════════════════════════════════════════════
+              ═══ 3D PREMIUM CARD 1: FULL TOOL SECTION (INTERACTIVE) ═══
+              ══════════════════════════════════════════════════════════ */}
+          <div
+            className="w-full rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 border flex flex-col justify-between transition-all select-none space-y-3"
+            style={{
+              background: "linear-gradient(145deg, rgba(20, 29, 54, 0.90) 0%, rgba(10, 16, 32, 0.96) 100%)",
+              borderColor: "rgba(16, 185, 129, 0.35)",
+              boxShadow: "0 10px 32px rgba(0, 0, 0, 0.50), inset 0 1px 1px rgba(255, 255, 255, 0.12)",
+              backdropFilter: "blur(16px)",
+            }}
           >
-            মুদ্রা নির্বাচন করুন:
-          </label>
-          <div className="flex items-center gap-2 overflow-x-auto pb-1.5 scrollbar-none">
-            {CURRENCIES.map((c) => {
-              const isSelected = c.code === selectedCurrencyCode;
-              return (
+            {/* Card 1 Top Bar */}
+            <div className="flex items-center justify-between pb-2 border-b border-white/10 shrink-0">
+              <div className="flex items-center gap-2">
+                <ArrowRightLeft className="w-4 h-4 text-[#10b981] shrink-0" />
+                <h4
+                  className="text-xs sm:text-sm font-bold text-[#F1EAD9] tracking-wide"
+                  style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
+                >
+                  লাইভ মুদ্রা রূপান্তরকারী (টাকার রেট)
+                </h4>
+              </div>
+              <span
+                className="text-[10px] font-bold px-2.5 py-0.5 rounded-full border bg-[rgba(16,185,129,0.15)] border-[#10b981] text-[#34d399]"
+                style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
+              >
+                লাইভ এক্সচেঞ্জ
+              </span>
+            </div>
+
+            {/* Quick Currency Selector Grid */}
+            <div>
+              <label
+                className="block text-xs font-bold text-[#E2E8F0] mb-1.5"
+                style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
+              >
+                মুদ্রা নির্বাচন করুন:
+              </label>
+              <div className="flex items-center gap-2 overflow-x-auto pb-1.5 scrollbar-none">
+                {CURRENCIES.map((c) => {
+                  const isSelected = c.code === selectedCurrencyCode;
+                  return (
+                    <button
+                      key={c.code}
+                      type="button"
+                      onClick={() => {
+                        playSweetTune();
+                        setSelectedCurrencyCode(c.code);
+                      }}
+                      className="px-3 py-1.5 rounded-xl flex items-center gap-1.5 shrink-0 transition-all select-none"
+                      style={{
+                        background: isSelected
+                          ? "linear-gradient(135deg, #34d399 0%, #10b981 100%)"
+                          : "rgba(255, 255, 255, 0.05)",
+                        border: isSelected ? "1.5px solid #34d399" : "1px solid rgba(255, 255, 255, 0.08)",
+                        color: isSelected ? "#0A1D16" : "#E2E8F0",
+                        fontWeight: isSelected ? 700 : 500,
+                      }}
+                    >
+                      <span className="text-base leading-none">{c.flag}</span>
+                      <span className="text-xs">{c.code}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Input Card with Direction Swap */}
+            <div className="rounded-xl p-3 bg-white/[0.04] border border-white/10 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span
+                  className="text-xs font-bold text-[#F1EAD9]"
+                  style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
+                >
+                  {isForeignToBdt ? `${currency.nameBn} (${currency.code})` : "বাংলাদেশি টাকা (BDT)"}
+                </span>
+
+                {/* Direction Toggle Button */}
                 <button
-                  key={c.code}
                   type="button"
                   onClick={() => {
                     playSweetTune();
-                    setSelectedCurrencyCode(c.code);
+                    setIsForeignToBdt(!isForeignToBdt);
                   }}
-                  className="px-3 py-2 rounded-xl flex items-center gap-1.5 shrink-0 transition-all select-none"
-                  style={{
-                    background: isSelected
-                      ? "linear-gradient(135deg, #F3D89B 0%, #D9B15C 100%)"
-                      : "rgba(255, 255, 255, 0.05)",
-                    border: isSelected ? "1.5px solid #F3D89B" : "1px solid rgba(255, 255, 255, 0.08)",
-                    color: isSelected ? "#1B2340" : "#E2E8F0",
-                    fontWeight: isSelected ? 700 : 500,
-                  }}
+                  className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] font-semibold text-[#34d399] flex items-center gap-1.5 border border-white/10 active:scale-95 transition-all"
                 >
-                  <span className="text-base leading-none">{c.flag}</span>
-                  <span className="text-xs">{c.code}</span>
+                  <ArrowRightLeft className="w-3 h-3" />
+                  <span>পরিবর্তন করুন</span>
                 </button>
-              );
-            })}
-          </div>
-        </div>
+              </div>
 
-        {/* Input Card with Direction Swap */}
-        <div className="rounded-2xl p-4 bg-white/[0.04] border border-white/10 space-y-3">
-          <div className="flex items-center justify-between">
-            <span
-              className="text-xs font-bold text-[#F1EAD9]"
-              style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
-            >
-              {isForeignToBdt ? `${currency.nameBn} (${currency.code})` : "বাংলাদেশি টাকা (BDT)"}
-            </span>
-
-            {/* Direction Toggle Button */}
-            <button
-              type="button"
-              onClick={() => {
-                playSweetTune();
-                setIsForeignToBdt(!isForeignToBdt);
-              }}
-              className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] font-semibold text-[#D9B15C] flex items-center gap-1.5 border border-white/10 active:scale-95 transition-all"
-            >
-              <ArrowRightLeft className="w-3 h-3" />
-              <span>পরিবর্তন করুন</span>
-            </button>
-          </div>
-
-          {/* Amount Input */}
-          <div className="flex items-center gap-2 bg-[#0d1326] border border-white/10 rounded-xl px-3 py-2.5">
-            <span className="text-base font-bold text-[#D9B15C]">
-              {isForeignToBdt ? currency.flag : "🇧🇩"}
-            </span>
-            <input
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
-              placeholder="পরিমাণ লিখুন..."
-              className="w-full bg-transparent text-lg font-bold text-white outline-none"
-            />
-            <span className="text-xs font-bold text-[#A0AEC0]">
-              {isForeignToBdt ? currency.code : "BDT"}
-            </span>
-          </div>
-
-          {/* Fast Preset Amount Buttons */}
-          <div className="flex items-center gap-1.5 pt-1">
-            <span className="text-[10.5px] text-[#A0AEC0] mr-1">দ্রুত নির্বাচন:</span>
-            {[100, 500, 1000, 5000].map((preset) => (
-              <button
-                key={preset}
-                type="button"
-                onClick={() => {
-                  playSweetTune();
-                  setAmount(preset);
-                }}
-                className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold text-[#E2E8F0] border border-white/5 active:scale-95 transition-transform"
-              >
-                {preset.toLocaleString("en-US")}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Conversion Result Display */}
-        <div
-          className="rounded-2xl p-4"
-          style={{
-            background: "linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(18, 24, 46, 0.90) 100%)",
-            border: "1.5px solid rgba(16, 185, 129, 0.40)",
-            boxShadow: "0 6px 24px rgba(0, 0, 0, 0.35)",
-          }}
-        >
-          <div className="flex items-center justify-between mb-1">
-            <span
-              className="text-xs text-[#A0AEC0] font-medium"
-              style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
-            >
-              {isForeignToBdt ? "মোট সমপরিমাণ টাকা" : `মোট সমপরিমাণ ${currency.nameBn}`}
-            </span>
-            <span className="text-[10px] text-[#10b981] font-mono font-bold">
-              ১ {currency.code} = ৳ {currency.rateToBdt} BDT
-            </span>
-          </div>
-
-          <div className="text-2xl sm:text-3xl font-black text-[#F3D89B] tracking-tight">
-            {isForeignToBdt ? "৳ " : `${currency.code} `}
-            {result.main.toLocaleString("bn-BD", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </div>
-
-          {/* Remittance Incentive Calculation */}
-          {isForeignToBdt && (
-            <div className="mt-3 pt-3 border-t border-white/10 space-y-1">
-              <div className="flex items-center justify-between text-[11px] text-[#CBD5E1]">
-                <span className="flex items-center gap-1">
-                  <Sparkles className="w-3 h-3 text-[#10b981]" />
-                  <span>সরকারি ২.৫% রেমিট্যান্স প্রণোদনা:</span>
+              {/* Amount Input */}
+              <div className="flex items-center gap-2 bg-[#0d1326] border border-white/10 rounded-xl px-3 py-2">
+                <span className="text-base font-bold text-[#10b981]">
+                  {isForeignToBdt ? currency.flag : "🇧🇩"}
                 </span>
-                <span className="font-bold text-[#10b981]">
-                  + ৳ {result.incentiveBdt.toLocaleString("bn-BD", { minimumFractionDigits: 2 })}
+                <input
+                  type="number"
+                  value={amount}
+                  onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
+                  placeholder="পরিমাণ লিখুন..."
+                  className="w-full bg-transparent text-base sm:text-lg font-bold text-white outline-none"
+                />
+                <span className="text-xs font-bold text-[#A0AEC0]">
+                  {isForeignToBdt ? currency.code : "BDT"}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between text-xs font-bold text-white pt-1">
-                <span>প্রণোদনাসহ মোট প্রাপ্তি (ব্যাংক রেট):</span>
-                <span className="text-sm font-black text-[#10b981]">
-                  ≈ ৳ {result.totalWithIncentive.toLocaleString("bn-BD", { minimumFractionDigits: 2 })}
-                </span>
+              {/* Fast Preset Amount Buttons */}
+              <div className="flex items-center gap-1.5 pt-0.5">
+                <span className="text-[10.5px] text-[#A0AEC0] mr-1">দ্রুত নির্বাচন:</span>
+                {[100, 500, 1000, 5000].map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => {
+                      playSweetTune();
+                      setAmount(preset);
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold text-[#E2E8F0] border border-white/5 active:scale-95 transition-transform"
+                  >
+                    {preset.toLocaleString("en-US")}
+                  </button>
+                ))}
               </div>
             </div>
-          )}
-        </div>
 
-        {/* Disclaimer */}
-        <div className="rounded-xl p-3 bg-white/5 border border-white/5 flex items-start gap-2 text-[11px] text-[#A0AEC0] leading-relaxed">
-          <AlertCircle className="w-4 h-4 text-[#D9B15C] shrink-0 mt-0.5" />
-          <span>
-            * এটি বাংলাদেশ ব্যাংক ও শীর্ষ এক্সচেঞ্জ হাউসগুলোর গড় রেফারেন্স রেট। ব্যাংক ভেদে বা মানিগ্রাম/ওয়েস্টার্ন ইউনিয়নে কিছুটা পরিবর্তন হতে পারে।
-          </span>
-        </div>
+            {/* Conversion Result Display */}
+            <div
+              className="rounded-2xl p-3.5 sm:p-4"
+              style={{
+                background: "linear-gradient(135deg, rgba(16, 185, 129, 0.16) 0%, rgba(18, 24, 46, 0.90) 100%)",
+                border: "1.5px solid rgba(16, 185, 129, 0.40)",
+                boxShadow: "0 6px 24px rgba(0, 0, 0, 0.35)",
+              }}
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span
+                  className="text-xs text-[#A0AEC0] font-medium"
+                  style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
+                >
+                  {isForeignToBdt ? "মোট সমপরিমাণ টাকা" : `মোট সমপরিমাণ ${currency.nameBn}`}
+                </span>
+                <span className="text-[10px] text-[#34d399] font-mono font-bold">
+                  ১ {currency.code} = ৳ {currency.rateToBdt} BDT
+                </span>
+              </div>
 
-        {/* ─── NEW: কী? কেন? কীভাবে? Interactive 3 Cards Section with In-Viewport Zoom ─── */}
-        <ToolGuideCards
-          sectionTitle="রেমিট্যান্স নির্দেশিকা (কী? কেন? কীভাবে?)"
-          subtitle="সরকারি প্রণোদনা, হুন্ডি প্রতিরোধ ও সেরা এক্সচেঞ্জ রেট পাওয়ার নিয়মাবলী"
-          theme="emerald"
-          items={CURRENCY_GUIDE_ITEMS}
-        />
+              <div className="text-2xl sm:text-3xl font-black text-[#F3D89B] tracking-tight">
+                {isForeignToBdt ? "৳ " : `${currency.code} `}
+                {result.main.toLocaleString("bn-BD", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+
+              {/* Remittance Incentive Calculation */}
+              {isForeignToBdt && (
+                <div className="mt-2.5 pt-2.5 border-t border-white/10 space-y-1">
+                  <div className="flex items-center justify-between text-[11px] text-[#CBD5E1]">
+                    <span className="flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-[#10b981]" />
+                      <span>সরকারি ২.৫% রেমিট্যান্স প্রণোদনা:</span>
+                    </span>
+                    <span className="font-bold text-[#34d399]">
+                      + ৳ {result.incentiveBdt.toLocaleString("bn-BD", { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs font-bold text-white pt-1">
+                    <span>প্রণোদনাসহ মোট প্রাপ্তি (ব্যাংক রেট):</span>
+                    <span className="text-sm font-black text-[#34d399]">
+                      ≈ ৳ {result.totalWithIncentive.toLocaleString("bn-BD", { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Disclaimer */}
+            <div className="rounded-xl p-2.5 bg-white/5 border border-white/5 flex items-start gap-2 text-[10.5px] text-[#A0AEC0] leading-relaxed">
+              <AlertCircle className="w-3.5 h-3.5 text-[#34d399] shrink-0 mt-0.5" />
+              <span>
+                * এটি বাংলাদেশ ব্যাংক ও শীর্ষ এক্সচেঞ্জ হাউসগুলোর গড় রেফারেন্স রেট। ব্যাংক ভেদে বা মানিগ্রাম/ওয়েস্টার্ন ইউনিয়নে কিছুটা পরিবর্তন হতে পারে।
+              </span>
+            </div>
+          </div>
+
+          {/* ══════════════════════════════════════════════════════════
+              ═══ 3D PREMIUM CARD 2: TOOL GUIDE CARDS (কী? কেন? কীভাবে?) ═══
+              ══════════════════════════════════════════════════════════ */}
+          <ToolGuideCards
+            sectionTitle="রেমিট্যান্স নির্দেশিকা (কী? কেন? কীভাবে?)"
+            subtitle="সরকারি প্রণোদনা, হুন্ডি প্রতিরোধ ও সেরা এক্সচেঞ্জ রেট পাওয়ার নিয়মাবলী"
+            theme="emerald"
+            items={CURRENCY_GUIDE_ITEMS}
+            className="w-full flex-1"
+          />
+        </div>
       </main>
 
-      {/* ─── Footer Action ─── */}
-      <footer
-        className="p-3.5 border-t border-white/10 bg-[#090d1a]/95 backdrop-blur-md shrink-0"
-        style={{
-          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 14px)",
-        }}
-      >
-        <button
-          type="button"
-          onClick={() => {
-            playSweetTune();
-            onClose();
-          }}
-          className="w-full py-2.5 rounded-xl text-xs font-bold text-[#1B2340] shadow-md active:scale-[0.98] transition-transform"
-          style={{
-            background: "linear-gradient(135deg, #F3D89B 0%, #D9B15C 100%)",
-            fontFamily: "'Hind Siliguri', sans-serif",
-          }}
-        >
-          সম্পন্ন করুন
-        </button>
-      </footer>
+      {/* ─── Sticky Footer with Attached Copyright Trust Bar ─── */}
+      <ToolModalFooter
+        onClose={onClose}
+        btnGradient="linear-gradient(135deg, #34d399 0%, #10b981 100%)"
+        btnTextColor="#0A1D16"
+      />
     </div>,
     document.body
   );

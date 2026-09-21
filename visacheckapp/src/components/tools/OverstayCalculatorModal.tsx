@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { X, Calculator, AlertTriangle, CheckCircle2, Info } from "lucide-react";
 import { playSweetTune } from "@/lib/sound";
 import ToolGuideCards, { ToolGuideItem } from "./ToolGuideCards";
+import ToolModalFooter from "./ToolModalFooter";
 
 interface OverstayCalculatorModalProps {
   isOpen: boolean;
@@ -257,210 +258,227 @@ export default function OverstayCalculatorModal({ isOpen, onClose }: OverstayCal
         </button>
       </header>
 
-      {/* ─── Body (Scrollable, 100% full screen responsive) ─── */}
-      <main className="p-4 overflow-y-auto space-y-4 flex-1 scrollbar-none">
-        {/* Country Selector */}
-        <div>
-          <label
-            className="block text-xs font-bold text-[#E2E8F0] mb-1.5"
-            style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
+      {/* ─── Body (Scrollable, 100% full screen auto-responsive with 2 3D Cards) ─── */}
+      <main className="flex-1 overflow-y-auto p-3 sm:p-3.5 scrollbar-none flex flex-col">
+        <div className="min-h-full flex flex-col justify-between gap-3 sm:gap-3.5 flex-1">
+          {/* ══════════════════════════════════════════════════════════
+              ═══ 3D PREMIUM CARD 1: FULL TOOL SECTION (INTERACTIVE) ═══
+              ══════════════════════════════════════════════════════════ */}
+          <div
+            className="w-full rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 border flex flex-col justify-between transition-all select-none space-y-3"
+            style={{
+              background: "linear-gradient(145deg, rgba(20, 29, 54, 0.90) 0%, rgba(10, 16, 32, 0.96) 100%)",
+              borderColor: "rgba(217, 177, 92, 0.35)",
+              boxShadow: "0 10px 32px rgba(0, 0, 0, 0.50), inset 0 1px 1px rgba(255, 255, 255, 0.12)",
+              backdropFilter: "blur(16px)",
+            }}
           >
-            দেশ নির্বাচন করুন:
-          </label>
-          <div className="grid grid-cols-3 gap-2">
-            {COUNTRY_RULES.map((country) => {
-              const isSelected = country.id === selectedCountryId;
-              return (
-                <button
-                  key={country.id}
-                  type="button"
-                  onClick={() => {
-                    playSweetTune();
-                    setSelectedCountryId(country.id);
-                  }}
-                  className="p-2.5 rounded-xl flex flex-col items-center justify-center gap-1 transition-all text-center select-none"
-                  style={{
-                    background: isSelected
-                      ? "linear-gradient(135deg, rgba(217, 177, 92, 0.25) 0%, rgba(58, 74, 142, 0.40) 100%)"
-                      : "rgba(255, 255, 255, 0.04)",
-                    border: isSelected ? "1.5px solid #D9B15C" : "1px solid rgba(255, 255, 255, 0.08)",
-                    boxShadow: isSelected ? "0 0 14px rgba(217, 177, 92, 0.25)" : "none",
-                  }}
+            {/* Card 1 Top Bar */}
+            <div className="flex items-center justify-between pb-2 border-b border-white/10 shrink-0">
+              <div className="flex items-center gap-2">
+                <Calculator className="w-4 h-4 text-[#D9B15C] shrink-0" />
+                <h4
+                  className="text-xs sm:text-sm font-bold text-[#F1EAD9] tracking-wide"
+                  style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
                 >
-                  <span className="text-xl leading-none">{country.flag}</span>
-                  <span
-                    className="text-[11px] font-semibold text-[#F1EAD9] line-clamp-1"
-                    style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
-                  >
-                    {country.nameBn}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Input Parameters: Visa Type & Expiry Date */}
-        <div className="grid grid-cols-2 gap-3">
-          {/* Visa Type */}
-          <div>
-            <label
-              className="block text-xs font-bold text-[#E2E8F0] mb-1.5"
-              style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
-            >
-              ভিসার ধরন:
-            </label>
-            <select
-              value={visaType}
-              onChange={(e) => {
-                playSweetTune();
-                setVisaType(e.target.value as "tourist" | "work");
-              }}
-              className="w-full bg-[#1A213E] border border-white/10 rounded-xl px-3 py-2 text-xs text-[#F1EAD9] focus:outline-none focus:border-[#D9B15C]"
-              style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
-            >
-              <option value="tourist">ট্যুরিস্ট / ভিজিট ভিসা</option>
-              <option value="work">কাজের ভিসা / রেসিডেন্স পারমিট</option>
-            </select>
-          </div>
-
-          {/* Expiry Date */}
-          <div>
-            <label
-              className="block text-xs font-bold text-[#E2E8F0] mb-1.5"
-              style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
-            >
-              ভিসার শেষ মেয়াদ:
-            </label>
-            <input
-              type="date"
-              value={expiryDateStr}
-              onChange={(e) => {
-                playSweetTune();
-                setExpiryDateStr(e.target.value);
-              }}
-              className="w-full bg-[#1A213E] border border-white/10 rounded-xl px-2.5 py-2 text-xs text-[#F1EAD9] focus:outline-none focus:border-[#D9B15C]"
-            />
-          </div>
-        </div>
-
-        {/* Calculation Result Box */}
-        {calculation && (
-          <div>
-            {calculation.isOverstayed ? (
-              <div
-                className="rounded-2xl p-4 border transition-all"
-                style={{
-                  background: "linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(30, 20, 35, 0.7) 100%)",
-                  borderColor: "rgba(239, 68, 68, 0.35)",
-                  boxShadow: "0 4px 20px rgba(239, 68, 68, 0.15)",
-                }}
-              >
-                <div className="flex items-center gap-2 text-red-400 mb-2">
-                  <AlertTriangle className="w-5 h-5 shrink-0" />
-                  <h4
-                    className="text-xs font-bold"
-                    style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
-                  >
-                    সতর্কতা: ভিসা ওভারস্টে হয়েছে ({calculation.daysOverstayed} দিন)
-                  </h4>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 text-center py-2 border-y border-red-500/20 my-2">
-                  <div>
-                    <span className="text-[10px] text-[#A0AEC0] block">আনুমানিক মোট জরিমানা</span>
-                    <span className="text-base font-extrabold text-red-200">
-                      {calculation.estimatedFine.toLocaleString("en-US")} {selectedCountry.currency}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-[#A0AEC0] block">বাংলাদেশি টাকায় রূপান্তর</span>
-                    <span className="text-base font-extrabold text-emerald-400">
-                      ≈ ৳ {calculation.bdtEquivalent.toLocaleString("bn-BD")}
-                    </span>
-                  </div>
-                </div>
-
-                <p className="text-[10px] text-[#A0AEC0] text-center mt-1">
-                  * প্রতিদিন {selectedCountry.dailyFine} {selectedCountry.currency} জরিমানা এবং আনুমানিক {selectedCountry.exitPassFee} {selectedCountry.currency} আউটপাস/ক্লিয়ারেন্স ফি যুক্ত করা হয়েছে।
-                </p>
+                  ভিসা মেয়াদ ও জরিমানা ক্যালকুলেটর
+                </h4>
               </div>
-            ) : (
-              <div
-                className="rounded-2xl p-4 border transition-all"
-                style={{
-                  background: "linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(15, 30, 25, 0.7) 100%)",
-                  borderColor: "rgba(16, 185, 129, 0.35)",
-                  boxShadow: "0 4px 20px rgba(16, 185, 129, 0.15)",
-                }}
+              <span
+                className="text-[10px] font-bold px-2.5 py-0.5 rounded-full border bg-[rgba(217,177,92,0.15)] border-[#D9B15C] text-[#F3D89B]"
+                style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
               >
-                <div className="flex items-center gap-2 text-emerald-400 mb-1">
-                  <CheckCircle2 className="w-5 h-5 shrink-0" />
-                  <h4
-                    className="text-xs font-bold"
-                    style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
+                লাইভ ক্যালকুলেশন
+              </span>
+            </div>
+
+            {/* Country Selector */}
+            <div>
+              <label
+                className="block text-xs font-bold text-[#E2E8F0] mb-1.5"
+                style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
+              >
+                দেশ নির্বাচন করুন:
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {COUNTRY_RULES.map((country) => {
+                  const isSelected = country.id === selectedCountryId;
+                  return (
+                    <button
+                      key={country.id}
+                      type="button"
+                      onClick={() => {
+                        playSweetTune();
+                        setSelectedCountryId(country.id);
+                      }}
+                      className="p-2 sm:p-2.5 rounded-xl flex flex-col items-center justify-center gap-1 transition-all text-center select-none"
+                      style={{
+                        background: isSelected
+                          ? "linear-gradient(135deg, rgba(217, 177, 92, 0.25) 0%, rgba(58, 74, 142, 0.40) 100%)"
+                          : "rgba(255, 255, 255, 0.04)",
+                        border: isSelected ? "1.5px solid #D9B15C" : "1px solid rgba(255, 255, 255, 0.08)",
+                        boxShadow: isSelected ? "0 0 14px rgba(217, 177, 92, 0.25)" : "none",
+                      }}
+                    >
+                      <span className="text-xl leading-none">{country.flag}</span>
+                      <span
+                        className="text-[11px] font-semibold text-[#F1EAD9] line-clamp-1"
+                        style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
+                      >
+                        {country.nameBn}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Input Parameters: Visa Type & Expiry Date */}
+            <div className="grid grid-cols-2 gap-2.5">
+              {/* Visa Type */}
+              <div>
+                <label
+                  className="block text-xs font-bold text-[#E2E8F0] mb-1"
+                  style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
+                >
+                  ভিসার ধরন:
+                </label>
+                <select
+                  value={visaType}
+                  onChange={(e) => {
+                    playSweetTune();
+                    setVisaType(e.target.value as "tourist" | "work");
+                  }}
+                  className="w-full bg-[#1A213E] border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-[#F1EAD9] focus:outline-none focus:border-[#D9B15C]"
+                  style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
+                >
+                  <option value="tourist">ট্যুরিস্ট / ভিজিট ভিসা</option>
+                  <option value="work">কাজের ভিসা / রেসিডেন্স পারমিট</option>
+                </select>
+              </div>
+
+              {/* Expiry Date */}
+              <div>
+                <label
+                  className="block text-xs font-bold text-[#E2E8F0] mb-1"
+                  style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
+                >
+                  ভিসার শেষ মেয়াদ:
+                </label>
+                <input
+                  type="date"
+                  value={expiryDateStr}
+                  onChange={(e) => {
+                    playSweetTune();
+                    setExpiryDateStr(e.target.value);
+                  }}
+                  className="w-full bg-[#1A213E] border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-[#F1EAD9] focus:outline-none focus:border-[#D9B15C]"
+                />
+              </div>
+            </div>
+
+            {/* Calculation Result Box */}
+            {calculation && (
+              <div>
+                {calculation.isOverstayed ? (
+                  <div
+                    className="rounded-2xl p-3 sm:p-3.5 border transition-all"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(239, 68, 68, 0.14) 0%, rgba(30, 20, 35, 0.8) 100%)",
+                      borderColor: "rgba(239, 68, 68, 0.35)",
+                      boxShadow: "0 4px 20px rgba(239, 68, 68, 0.15)",
+                    }}
                   >
-                    ভিসা এখনো বৈধ আছে ({calculation.daysRemaining} দিন বাকি)
-                  </h4>
-                </div>
-                <p className="text-[11px] text-[#A0AEC0] mt-1">
-                  আপনার ভিসায় কোনো জরিমানা নেই। মেয়াদ শেষ হওয়ার অন্তত ৭–১০ দিন আগে দেশে ফেরা অথবা ভিসা নবায়ন করার পরামর্শ দেওয়া হচ্ছে।
-                </p>
+                    <div className="flex items-center gap-2 text-red-400 mb-1.5">
+                      <AlertTriangle className="w-4 h-4 shrink-0" />
+                      <h4
+                        className="text-xs font-bold"
+                        style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
+                      >
+                        সতর্কতা: ভিসা ওভারস্টে হয়েছে ({calculation.daysOverstayed} দিন)
+                      </h4>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-center py-1.5 border-y border-red-500/20 my-1.5">
+                      <div>
+                        <span className="text-[10px] text-[#A0AEC0] block">আনুমানিক মোট জরিমানা</span>
+                        <span className="text-sm sm:text-base font-extrabold text-red-200">
+                          {calculation.estimatedFine.toLocaleString("en-US")} {selectedCountry.currency}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-[#A0AEC0] block">বাংলাদেশি টাকায় রূপান্তর</span>
+                        <span className="text-sm sm:text-base font-extrabold text-emerald-400">
+                          ≈ ৳ {calculation.bdtEquivalent.toLocaleString("bn-BD")}
+                        </span>
+                      </div>
+                    </div>
+
+                    <p className="text-[10px] text-[#A0AEC0] text-center mt-0.5">
+                      * প্রতিদিন {selectedCountry.dailyFine} {selectedCountry.currency} জরিমানা এবং আনুমানিক {selectedCountry.exitPassFee} {selectedCountry.currency} আউটপাস/ক্লিয়ারেন্স ফি যুক্ত করা হয়েছে।
+                    </p>
+                  </div>
+                ) : (
+                  <div
+                    className="rounded-2xl p-3 sm:p-3.5 border transition-all"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(16, 185, 129, 0.14) 0%, rgba(15, 30, 25, 0.8) 100%)",
+                      borderColor: "rgba(16, 185, 129, 0.35)",
+                      boxShadow: "0 4px 20px rgba(16, 185, 129, 0.15)",
+                    }}
+                  >
+                    <div className="flex items-center gap-2 text-emerald-400 mb-1">
+                      <CheckCircle2 className="w-4 h-4 shrink-0" />
+                      <h4
+                        className="text-xs font-bold"
+                        style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
+                      >
+                        ভিসা এখনো বৈধ আছে ({calculation.daysRemaining} দিন বাকি)
+                      </h4>
+                    </div>
+                    <p className="text-[11px] text-[#A0AEC0] mt-0.5">
+                      আপনার ভিসায় কোনো জরিমানা নেই। মেয়াদ শেষ হওয়ার অন্তত ৭–১০ দিন আগে দেশে ফেরা অথবা ভিসা নবায়ন করার পরামর্শ দেওয়া হচ্ছে।
+                    </p>
+                  </div>
+                )}
               </div>
             )}
+
+            {/* Country Official Guidance Notes */}
+            <div className="rounded-xl p-2.5 bg-white/5 border border-white/5">
+              <h4
+                className="text-[11px] font-bold text-[#F3D89B] flex items-center gap-1.5 mb-1.5"
+                style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
+              >
+                <Info className="w-3.5 h-3.5 text-[#D9B15C]" />
+                <span>{selectedCountry.nameBn}-র সরকারি নিয়মাবলী:</span>
+              </h4>
+              <ul className="space-y-1 text-[10.5px] text-[#A0AEC0]">
+                {selectedCountry.rulesBn.map((r, i) => (
+                  <li key={i} className="flex items-start gap-1.5">
+                    <span className="text-[#D9B15C] mt-0.5">•</span>
+                    <span>{r}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-        )}
 
-        {/* Country Official Guidance Notes */}
-        <div className="rounded-xl p-3 bg-white/5 border border-white/5">
-          <h4
-            className="text-xs font-bold text-[#F3D89B] flex items-center gap-1.5 mb-2"
-            style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
-          >
-            <Info className="w-3.5 h-3.5 text-[#D9B15C]" />
-            <span>{selectedCountry.nameBn}-র সরকারি নিয়মাবলী:</span>
-          </h4>
-          <ul className="space-y-1.5 text-[11px] text-[#A0AEC0]">
-            {selectedCountry.rulesBn.map((r, i) => (
-              <li key={i} className="flex items-start gap-1.5">
-                <span className="text-[#D9B15C] mt-0.5">•</span>
-                <span>{r}</span>
-              </li>
-            ))}
-          </ul>
+          {/* ══════════════════════════════════════════════════════════
+              ═══ 3D PREMIUM CARD 2: TOOL GUIDE CARDS (কী? কেন? কীভাবে?) ═══
+              ══════════════════════════════════════════════════════════ */}
+          <ToolGuideCards
+            sectionTitle="ওভারস্টে নির্দেশিকা (কী? কেন? কীভাবে?)"
+            subtitle="জরিমানা বিধি, আইনি ঝুঁকি ও সরকারি সাধারণ ক্ষমা সম্পর্কে বিস্তারিত জানুন"
+            theme="gold"
+            items={OVERSTAY_GUIDE_ITEMS}
+            className="w-full flex-1"
+          />
         </div>
-
-        {/* ─── NEW: কী? কেন? কীভাবে? Interactive 3 Cards Section with In-Viewport Zoom ─── */}
-        <ToolGuideCards
-          sectionTitle="ওভারস্টে নির্দেশিকা (কী? কেন? কীভাবে?)"
-          subtitle="জরিমানা বিধি, আইনি ঝুঁকি ও সরকারি সাধারণ ক্ষমা সম্পর্কে বিস্তারিত জানুন"
-          theme="gold"
-          items={OVERSTAY_GUIDE_ITEMS}
-        />
       </main>
 
-      {/* ─── Footer Action ─── */}
-      <footer
-        className="p-3.5 border-t border-white/10 bg-[#090d1a]/95 backdrop-blur-md shrink-0"
-        style={{
-          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 14px)",
-        }}
-      >
-        <button
-          type="button"
-          onClick={() => {
-            playSweetTune();
-            onClose();
-          }}
-          className="w-full py-2.5 rounded-xl text-xs font-bold text-[#1B2340] shadow-md active:scale-[0.98] transition-transform"
-          style={{
-            background: "linear-gradient(135deg, #F3D89B 0%, #D9B15C 100%)",
-            fontFamily: "'Hind Siliguri', sans-serif",
-          }}
-        >
-          সম্পন্ন করুন
-        </button>
-      </footer>
+      {/* ─── Sticky Footer with Attached Copyright Trust Bar ─── */}
+      <ToolModalFooter onClose={onClose} />
     </div>,
     document.body
   );

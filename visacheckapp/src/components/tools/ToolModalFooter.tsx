@@ -50,13 +50,13 @@ export default function ToolModalFooter({
         <span>{closeBtnText}</span>
       </button>
 
-      {/* Copyright Trust Bar (Official Finish Line) */}
+      {/* Copyright Trust Bar (Official Sticky Finish Line) */}
       <div
         className="w-full max-w-xl flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full select-none"
         style={{
-          background: "linear-gradient(135deg, rgba(27, 35, 64, 0.92) 0%, rgba(11, 13, 28, 0.96) 100%)",
+          background: "linear-gradient(135deg, rgba(27, 35, 64, 0.95) 0%, rgba(11, 13, 28, 0.98) 100%)",
           border: "1px solid rgba(217, 177, 92, 0.45)",
-          boxShadow: "0 4px 14px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12)",
+          boxShadow: "0 4px 14px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12)",
         }}
       >
         <ShieldCheck className="w-3.5 h-3.5 shrink-0 text-[#D9B15C]" strokeWidth={2.2} />
@@ -64,15 +64,15 @@ export default function ToolModalFooter({
           className="text-[10.5px] sm:text-[11px] font-medium tracking-tight text-center leading-tight truncate text-[#D8E0F0]"
           style={{ fontFamily: "'Hind Siliguri', sans-serif" }}
         >
-          <span>© ২০২৬ Visa Check App • </span>
+          <span>© ২০২৬ Probashi App </span>
           <button
             type="button"
             onClick={handleLinkClick}
-            className="font-bold underline underline-offset-2 hover:opacity-80 transition-opacity text-[#F3D89B]"
+            className="cursor-pointer font-semibold underline underline-offset-2 transition-colors hover:brightness-125 text-[#D9B15C]"
           >
-            visacheckapp.net
+            (visacheckapp.net)
           </button>
-          <span> • সর্বস্বত্ব সংরক্ষিত</span>
+          <span> — সর্বস্বত্ব সংরক্ষিত।</span>
         </p>
       </div>
     </footer>
