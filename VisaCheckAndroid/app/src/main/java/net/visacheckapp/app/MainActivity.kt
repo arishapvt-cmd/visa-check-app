@@ -33,9 +33,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         // ── SplashScreen API: must be called BEFORE super.onCreate() ───────
-        // This keeps the OS splash screen visible until we call setKeepOnScreenCondition(false)
         val splashScreen = installSplashScreen()
-        splashScreen.setKeepOnScreenCondition { !webViewReady }
+        splashScreen.setKeepOnScreenCondition { false }
 
         super.onCreate(savedInstanceState)
 
@@ -82,6 +81,30 @@ class MainActivity : AppCompatActivity() {
             FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT
         ))
         rootLayout.addView(progressBar)
+
+        // ── 5-Phase Jetpack Compose Splash Screen Overlay ──────────────
+        val splashComposeView = androidx.compose.ui.platform.ComposeView(this).apply {
+            setContent {
+                net.visacheckapp.app.ui.splash.SplashScreen(
+                    isInitReady = { webViewReady },
+                    onAnimationComplete = {
+                        animate()
+                            .alpha(0f)
+                            .setDuration(250)
+                            .withEndAction {
+                                try {
+                                    rootLayout.removeView(this)
+                                } catch (_: Throwable) {}
+                            }
+                            .start()
+                    }
+                )
+            }
+        }
+        rootLayout.addView(splashComposeView, FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT
+        ))
+
         setContentView(rootLayout)
 
         swipeRefresh.setOnRefreshListener { webView.reload() }
@@ -277,10 +300,10 @@ class MainActivity : AppCompatActivity() {
         else super.onBackPressed()
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        val targetUrl = intent?.getStringExtra("url")
+        val targetUrl = intent.getStringExtra("url")
         if (!targetUrl.isNullOrEmpty()) {
             webView.loadUrl(targetUrl)
         }

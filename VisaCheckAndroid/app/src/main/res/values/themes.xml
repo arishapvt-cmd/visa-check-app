@@ -2,7 +2,7 @@
     <!-- Base theme — no action bar, fullscreen -->
     <style name="Theme.VisaCheckApp" parent="Theme.SplashScreen">
         <!-- SplashScreen API: icon shown on the system-level splash -->
-        <item name="windowSplashScreenBackground">#020817</item>
+        <item name="windowSplashScreenBackground">#FFFFFF</item>
         <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_round</item>
         <item name="windowSplashScreenAnimationDuration">300</item>
         <!-- The theme to apply AFTER the splash is dismissed -->
