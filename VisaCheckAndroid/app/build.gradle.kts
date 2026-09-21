@@ -6,6 +6,7 @@ plugins {
 android {
     namespace = "net.visacheckapp.app"
     compileSdk = 36
+    buildToolsVersion = "35.0.0"
 
     defaultConfig {
         applicationId = "net.visacheckapp.app"

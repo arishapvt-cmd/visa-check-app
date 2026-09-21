@@ -22,6 +22,7 @@ const COUNTRY_HANDLERS: Record<string, (data: Record<string, string>) => Promise
   "qatar": checkGulfVisa("Qatar"),
   "kuwait": checkGulfVisa("Kuwait"),
   "bahrain": checkGulfVisa("Bahrain"),
+  "jordan": checkGulfVisa("Jordan"),
   "oman": checkGulfVisa("Oman"),
   "italy": checkSchengenVisa("Italy"),
   "germany": checkSchengenVisa("Germany"),

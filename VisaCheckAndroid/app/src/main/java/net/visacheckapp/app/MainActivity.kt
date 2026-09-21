@@ -114,6 +114,7 @@ class MainActivity : AppCompatActivity() {
     //  ASSET SERVING — gzip-first, with Cache-Control headers
     // ─────────────────────────────────────────────────────────────────────
     private fun serveAsset(path: String): WebResourceResponse? {
+        // Remap /_next/ → /next_files/ to avoid Android AssetManager issues with leading underscores
         val remappedPath = path.replace("/_next/", "/next_files/")
         val clean = remappedPath.trimStart('/')
 

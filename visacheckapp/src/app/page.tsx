@@ -3,11 +3,17 @@
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
-import { ChevronDown, ChevronUp, Heart } from "lucide-react";
+import { ChevronDown, ChevronUp, Heart, Search } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { useAndroidBridge } from "@/hooks/useAndroidBridge";
 import { MiniCardAmbientBg } from "@/components/MiniCardAmbientBg";
+import { CountryBannerSlider } from "@/components/CountryBannerSlider";
+import { CountryGuideCardsGrid } from "@/components/CountryGuideCardsGrid";
+import GoldenGlassTitle from "@/components/GoldenGlassTitle";
+import InfoResourceCards from "@/components/InfoResourceCards";
+import FinalFooter from "@/components/FinalFooter";
+import { playSweetTune } from "@/lib/sound";
 
 /* ─── 20 Countries ─────────────────────────────────────────── */
 const ALL_COUNTRIES = [
@@ -35,7 +41,7 @@ const ALL_COUNTRIES = [
 
 const VISIBLE_DEFAULT = 8;
 
-/* ─── Country Card (with Favorite button) ──────────────────── */
+/* ─── Country Card (with Flag Ring Badge & Navy+Gold Glass) ─── */
 function CountryCard({
   country,
   index,
@@ -51,105 +57,54 @@ function CountryCard({
   isFav: boolean;
   onToggleFav: (id: string) => void;
 }) {
-  // Staggered wind fluttering delay so neighboring flags don't wave synchronously
-  const waveDelay = `${(index % 4) * 0.45}s`;
-  const sheenDelay = `${(index % 4) * 0.45 + 0.3}s`;
-
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.85 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.3, delay: index * 0.04 }}
+      whileTap={{ scale: 0.92 }}
       className="relative"
     >
       <Link
         href={`/countries/${country.id}`}
-        className="flex flex-col items-center gap-1.5 group"
+        onClick={() => playSweetTune()}
+        className="w-full rounded-[16px] flex flex-col items-center justify-center p-2 sm:p-2.5 transition-all duration-200 group relative overflow-hidden"
+        style={{
+          background: isDark
+            ? "linear-gradient(160deg, rgba(58, 74, 142, 0.38) 0%, rgba(27, 35, 64, 0.60) 100%)"
+            : "linear-gradient(160deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 248, 255, 0.90) 100%)",
+          border: isDark
+            ? "1px solid rgba(217, 177, 92, 0.30)"
+            : "1px solid rgba(217, 177, 92, 0.35)",
+          borderRadius: "16px",
+          boxShadow: isDark
+            ? "0 10px 20px rgba(0, 0, 0, 0.35)"
+            : "0 4px 12px rgba(0, 0, 0, 0.08)",
+          minHeight: "96px",
+        }}
       >
-        {/* Icon Card with Frosted Glass & Ambient Canvas */}
+        {/* Flag Icon with 2px circular gold gradient ring */}
         <div
-          className="w-full aspect-square rounded-2xl flex flex-col items-center justify-center relative overflow-hidden transition-all duration-200 group-active:scale-92 group-active:brightness-110"
+          className="w-12 h-12 rounded-full p-[2px] flex items-center justify-center relative shadow-sm shrink-0"
           style={{
-            background: isDark
-              ? "linear-gradient(135deg, rgba(15, 23, 42, 0.78) 0%, rgba(10, 15, 29, 0.9) 100%)"
-              : "linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(240, 248, 255, 0.85) 100%)",
-            backdropFilter: "blur(12px)",
-            WebkitBackdropFilter: "blur(12px)",
-            border: isDark
-              ? `1px solid ${country.color}33`
-              : `1px solid rgba(255, 255, 255, 0.95)`,
-            boxShadow: isDark
-              ? `0 4px 16px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 0 14px ${country.color}18`
-              : `0 4px 16px rgba(14, 165, 233, 0.1), 0 1px 3px rgba(0, 0, 0, 0.04), inset 0 1px 0 #ffffff`,
+            background: "linear-gradient(135deg, #D9B15C 0%, #F3D89B 100%)",
           }}
         >
-          {/* 7-Layer Ambient Micro-Canvas Background (Vector Silhouettes + IATA telemetry + Dot Matrix) */}
-          <MiniCardAmbientBg countryId={country.id} color={country.color} isDark={isDark} />
-
-          {/* 3D Waving Flag in Wind with Sunlight Sheen */}
           <div
-            className="relative z-10 flex items-center justify-center select-none"
+            className="w-full h-full rounded-full flex items-center justify-center overflow-hidden"
             style={{
-              animation: `flagWindWave 3.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite`,
-              animationDelay: waveDelay,
-              transformOrigin: "left center",
-              willChange: "transform, filter",
+              background: isDark ? "#0d1326" : "#f8fafc",
             }}
           >
-            {/* Flag Emoji */}
-            <span className="text-4xl leading-none block select-none">
+            <span className="text-[26px] leading-none block select-none">
               {country.flag}
             </span>
-
-            {/* Sunlight Sheen Overlay fluttering over flag cloth */}
-            <div
-              className="absolute inset-0 pointer-events-none rounded-sm overflow-hidden"
-              style={{
-                background: "linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.7) 50%, transparent 80%)",
-                animation: `flagSunSheen 3.4s ease-in-out infinite`,
-                animationDelay: sheenDelay,
-                mixBlendMode: isDark ? "overlay" : "screen",
-              }}
-            />
           </div>
-
-          {/* ❤️ Favorite badge — top-right corner */}
-          <button
-            className="absolute top-1.5 right-1.5 z-20 w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 active:scale-90"
-            style={{
-              background: isFav
-                ? "rgba(239,68,68,0.9)"
-                : isDark ? "rgba(15,23,42,0.75)" : "rgba(255,255,255,0.85)",
-              backdropFilter: "blur(6px)",
-              WebkitBackdropFilter: "blur(6px)",
-              border: isFav
-                ? "1px solid rgba(239,68,68,0.5)"
-                : `1px solid ${isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.08)"}`,
-              boxShadow: isFav ? "0 2px 6px rgba(239,68,68,0.4)" : "none",
-            }}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onToggleFav(country.id);
-            }}
-            aria-label={isFav ? "Remove from favorites" : "Add to favorites"}
-          >
-            <Heart
-              className="w-3 h-3"
-              style={{
-                color: isFav ? "#fff" : isDark ? "#475569" : "#94a3b8",
-                fill: isFav ? "#fff" : "none",
-              }}
-            />
-          </button>
         </div>
 
         {/* Country Name */}
         <span
-          className="text-[11px] font-bold text-center transition-colors leading-tight px-0.5 group-active:text-sky-400"
+          className="text-[11px] sm:text-[12px] font-semibold text-center leading-tight truncate max-w-full px-0.5 mt-1.5"
           style={{
             fontFamily: "'Hind Siliguri', sans-serif",
-            color: isDark ? "#cbd5e1" : "#334155",
+            color: isDark ? "#F1EAD9" : "#1e293b",
           }}
         >
           {lang === "bn" ? country.namebn : country.nameEn}
@@ -255,6 +210,7 @@ function FavoritesSection({
 /* ─── Main Page ─────────────────────────────────────────────── */
 export default function HomePage() {
   const [expanded, setExpanded] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [favorites, setFavorites] = useState<string[]>([]);
   const { isDark } = useTheme();
   const { t, lang } = useLanguage();
@@ -277,57 +233,69 @@ export default function HomePage() {
     }
   }, [favorites, bridge]);
 
-  const visibleCountries = expanded
-    ? ALL_COUNTRIES
-    : ALL_COUNTRIES.slice(0, VISIBLE_DEFAULT);
+  const filteredCountries = searchQuery.trim()
+    ? ALL_COUNTRIES.filter(
+        (c) =>
+          c.namebn.includes(searchQuery.trim()) ||
+          c.nameEn.toLowerCase().includes(searchQuery.trim().toLowerCase()) ||
+          c.id.toLowerCase().includes(searchQuery.trim().toLowerCase())
+      )
+    : ALL_COUNTRIES;
 
-  const hiddenCount = ALL_COUNTRIES.length - VISIBLE_DEFAULT;
+  const visibleCountries = expanded
+    ? filteredCountries
+    : filteredCountries.slice(0, VISIBLE_DEFAULT);
 
   return (
     <div
       className="min-h-screen transition-colors duration-350"
       style={{
-        backgroundColor: "var(--bg-page)",
+        background: isDark
+          ? "radial-gradient(120% 60% at 50% 0%, #171B34 0%, #0B0D1C 55%)"
+          : "var(--bg-page)",
         paddingTop: "calc(env(safe-area-inset-top, 0px) + 58px)",
-        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 80px)",
+        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 8px)",
       }}
     >
 
-      {/* ══ SECTION 1 — Glassy Title Button (Flush below header) ══ */}
-      <div className="flex justify-center px-3 mb-2.5 mt-1.5">
-        <motion.div
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-2xl max-w-full"
+      {/* ══ SECTION 1 — Country Search Bar ("দেশ খুঁজুন...") ══ */}
+      <div className="px-3 mt-1.5 mb-3">
+        <div
+          className="flex items-center gap-2.5 px-3.5 py-2.5 transition-all duration-200"
           style={{
-            background: isDark
-              ? "linear-gradient(135deg, rgba(14,165,233,0.20) 0%, rgba(99,102,241,0.15) 100%)"
-              : "linear-gradient(135deg, rgba(14,165,233,0.12) 0%, rgba(99,102,241,0.08) 100%)",
-            border: isDark
-              ? "1.5px solid rgba(14,165,233,0.38)"
-              : "1.5px solid rgba(14,165,233,0.32)",
-            backdropFilter: "blur(16px) saturate(180%)",
-            WebkitBackdropFilter: "blur(16px) saturate(180%)",
-            boxShadow: isDark
-              ? "0 4px 20px rgba(14,165,233,0.20), inset 0 1px 0 rgba(255,255,255,0.12)"
-              : "0 4px 16px rgba(14,165,233,0.12), inset 0 1px 0 rgba(255,255,255,0.8)",
+            background: "rgba(255, 255, 255, 0.05)",
+            border: "1px solid rgba(217, 177, 92, 0.22)",
+            borderRadius: "14px",
           }}
         >
-          <span
-            className="font-bold text-[14px] sm:text-[15px] tracking-tight truncate"
+          <Search
+            className="w-4 h-4 shrink-0"
+            style={{ color: "#8A8FA3" }}
+          />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={lang === "bn" ? "দেশ খুঁজুন..." : "Search country..."}
+            className="w-full bg-transparent outline-none text-[13px] font-medium placeholder:text-[#8A8FA3]"
             style={{
+              color: "#F5F6FA",
               fontFamily: "'Hind Siliguri', sans-serif",
-              color: isDark ? "#7dd3fc" : "#0369a1",
             }}
-          >
-            {t("আপনার পছন্দের দেশ নির্বাচন করুন", "Choose your preferred country")}
-          </span>
-          <span className="text-base sm:text-lg leading-none shrink-0">👇</span>
-        </motion.div>
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery("")}
+              className="text-[#8A8FA3] text-xs font-bold px-1"
+            >
+              ✕
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* ══ SECTION 2 — Favorites (shown when at least 1 saved) ══ */}
+      {/* ══ Favorites (shown when at least 1 saved) ══ */}
       <AnimatePresence>
         {favorites.length > 0 && (
           <FavoritesSection
@@ -340,164 +308,66 @@ export default function HomePage() {
         )}
       </AnimatePresence>
 
-      {/* ══ SECTION 3 — Country Grid ══════════════════════════════ */}
-      <div className="px-3 mb-3">
-        <div
-          className="rounded-2xl p-3.5"
-          style={{
-            background: isDark
-              ? "linear-gradient(145deg, #0b1628 0%, #060f1e 100%)"
-              : "#ffffff",
-            border: isDark
-              ? "1px solid rgba(255,255,255,0.07)"
-              : "1px solid rgba(14,165,233,0.12)",
-            boxShadow: isDark
-              ? "0 8px 32px rgba(0,0,0,0.4)"
-              : "0 4px 20px rgba(14,165,233,0.08)",
-          }}
-        >
-          <div className="grid grid-cols-4 gap-3">
-            {visibleCountries.map((country, i) => (
-              <CountryCard
-                key={country.id}
-                country={country}
-                index={i}
-                isDark={isDark}
-                lang={lang}
-                isFav={favorites.includes(country.id)}
-                onToggleFav={toggleFavorite}
-              />
-            ))}
-          </div>
+      {/* ══ SECTION TITLE 1 — "জনপ্রিয় দেশ" (Golden Glassy Button) ══ */}
+      <GoldenGlassTitle title={lang === "bn" ? "জনপ্রিয় দেশ" : "Popular Countries"} />
 
-          {/* Expand / Collapse */}
-          <AnimatePresence>
-            {!expanded && (
-              <motion.button
-                key="show-more"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setExpanded(true)}
-                className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold text-sm transition-all active:scale-95"
-                style={{
-                  background: isDark
-                    ? "linear-gradient(135deg, rgba(14,165,233,0.12) 0%, rgba(99,102,241,0.12) 100%)"
-                    : "linear-gradient(135deg, rgba(14,165,233,0.08) 0%, rgba(99,102,241,0.08) 100%)",
-                  border: isDark
-                    ? "1px solid rgba(14,165,233,0.25)"
-                    : "1px solid rgba(14,165,233,0.3)",
-                  color: isDark ? "#38bdf8" : "#0284c7",
-                  fontFamily: "'Hind Siliguri', sans-serif",
-                }}
-              >
-                <span>{t(`আরও দেখুন (${hiddenCount}টি দেশ)`, `Show More (${hiddenCount} Countries)`)}</span>
-                <ChevronDown className="w-4 h-4" />
-              </motion.button>
-            )}
-          </AnimatePresence>
-
-          <AnimatePresence>
-            {expanded && (
-              <motion.button
-                key="show-less"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setExpanded(false)}
-                className="mt-4 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold text-sm transition-all active:scale-95"
-                style={{
-                  background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)",
-                  border: isDark ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(0,0,0,0.08)",
-                  color: isDark ? "#94a3b8" : "#64748b",
-                  fontFamily: "'Hind Siliguri', sans-serif",
-                }}
-              >
-                <span>{t("কম দেখুন", "Show Less")}</span>
-                <ChevronUp className="w-4 h-4" />
-              </motion.button>
-            )}
-          </AnimatePresence>
+      {/* ══ SECTION 2 — Top Quick-Access Flag Grid (4 Columns) ══ */}
+      <div className="px-3">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px" }}>
+          {visibleCountries.map((country, i) => (
+            <CountryCard
+              key={country.id}
+              country={country}
+              index={i}
+              isDark={isDark}
+              lang={lang}
+              isFav={favorites.includes(country.id)}
+              onToggleFav={toggleFavorite}
+            />
+          ))}
         </div>
       </div>
 
-      {/* ══ SECTION 4 — Stats & How it works ═════════════════════ */}
-      <div className="px-3 mb-4">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.45 }}
-          className="rounded-3xl overflow-hidden"
-          style={{
-            background: isDark
-              ? "linear-gradient(135deg,rgba(14,165,233,0.07) 0%,rgba(99,102,241,0.07) 100%)"
-              : "linear-gradient(135deg,rgba(14,165,233,0.05) 0%,rgba(99,102,241,0.05) 100%)",
-            border: isDark
-              ? "1px solid rgba(14,165,233,0.15)"
-              : "1px solid rgba(14,165,233,0.18)",
-          }}
-        >
-          <div className="px-4 pt-4 pb-2">
-            <h3
-              className="font-extrabold text-[13px]"
-              style={{
-                fontFamily: "'Hind Siliguri', sans-serif",
-                color: isDark ? "#e2e8f0" : "#0f172a",
-              }}
+      {/* ══ PART C — Circular Expand Button #1 (Floating on Seam) ══ */}
+      {filteredCountries.length > VISIBLE_DEFAULT && (
+        <div className="relative z-20 flex justify-center -mb-5 mt-2">
+          <motion.button
+            type="button"
+            aria-label="আরও দেশ দেখুন"
+            onClick={() => {
+              playSweetTune();
+              setExpanded(!expanded);
+            }}
+            whileTap={{ scale: 0.9 }}
+            className="w-[42px] h-[42px] rounded-full flex items-center justify-center cursor-pointer select-none"
+            style={{
+              background: "linear-gradient(135deg, #F3D89B 0%, #D9B15C 100%)",
+              border: "2px solid rgba(255, 255, 255, 0.25)",
+              boxShadow: "0 8px 20px rgba(217, 177, 92, 0.5), 0 2px 6px rgba(0, 0, 0, 0.3)",
+            }}
+          >
+            <motion.div
+              animate={{ rotate: expanded ? 180 : 0 }}
+              transition={{ duration: 0.28, ease: "easeInOut" }}
+              className="flex items-center justify-center"
             >
-              {t("সারাংশ", "Quick Overview")}
-            </h3>
-          </div>
+              <ChevronDown className="w-5 h-5 text-[#1B2340]" strokeWidth={2.5} />
+            </motion.div>
+          </motion.button>
+        </div>
+      )}
 
-          <div className="grid grid-cols-3 gap-2 px-3 pb-3">
-            {[
-              { value: "২০", label: t("দেশ", "Countries"), icon: "🌍", color: "#0ea5e9" },
-              { value: "৯০+", label: t("ভিসা ধরন", "Visa Types"), icon: "📋", color: "#8b5cf6" },
-              { value: "100%", label: t("সরকারি তথ্য", "Official Data"), icon: "✅", color: "#10b981" },
-            ].map((stat) => (
-              <div
-                key={stat.label}
-                className="flex flex-col items-center gap-1 py-3 rounded-2xl"
-                style={{
-                  background: isDark ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.8)",
-                  border: isDark ? `1px solid ${stat.color}20` : `1px solid ${stat.color}25`,
-                }}
-              >
-                <span className="text-xl leading-none">{stat.icon}</span>
-                <span
-                  className="font-extrabold text-[15px]"
-                  style={{ color: stat.color, fontFamily: "'Hind Siliguri', sans-serif" }}
-                >{stat.value}</span>
-                <span
-                  className="text-[10px] font-medium text-center"
-                  style={{ color: isDark ? "#64748b" : "#94a3b8", fontFamily: "'Hind Siliguri', sans-serif" }}
-                >{stat.label}</span>
-              </div>
-            ))}
-          </div>
+      {/* ══ SECTION 3.5 — 20 Country Compact Banner Slider (Exact 110px) ══ */}
+      <CountryBannerSlider />
 
-          <div className="px-3 pb-4 flex flex-col gap-2">
-            {[
-              { step: "01", text: t("দেশ বেছে নিন", "Choose a country"), color: "#0ea5e9" },
-              { step: "02", text: t("ভিসা ধরন সিলেক্ট করুন", "Select visa type"), color: "#8b5cf6" },
-              { step: "03", text: t("আবেদন নম্বর দিয়ে চেক করুন", "Enter details & check"), color: "#10b981" },
-            ].map(({ step, text, color }) => (
-              <div key={step} className="flex items-center gap-3">
-                <span
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-extrabold shrink-0"
-                  style={{ background: color + "22", color, border: `1.5px solid ${color}55` }}
-                >{step}</span>
-                <span
-                  className="text-[12px] font-semibold"
-                  style={{ color: isDark ? "#cbd5e1" : "#334155", fontFamily: "'Hind Siliguri', sans-serif" }}
-                >{text}</span>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
+      {/* ══ SECTION 3.8 — 20 Country Mini Cards Grid (Style A Holographic Squircle & Bottom Sheet Drawer) ══ */}
+      <CountryGuideCardsGrid />
 
-      <div className="h-4" />
+      {/* ══ 4 Compact Logo-Themed Resource Cards (Replacing Old Summary) ══ */}
+      <InfoResourceCards lang={lang} />
+
+      {/* ══ FINAL FOOTER — Slim Trust Bar Card (No More Scrolling Below) ══ */}
+      <FinalFooter lang={lang} />
     </div>
   );
 }

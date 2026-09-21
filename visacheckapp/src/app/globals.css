@@ -3,41 +3,41 @@
 /* ═══ DARK THEME (default) ═══ */
 :root,
 [data-theme="dark"] {
-  --primary: #0ea5e9;
-  --primary-dark: #0284c7;
-  --primary-light: #38bdf8;
-  --accent: #6366f1;
+  --primary: #D9B15C;
+  --primary-dark: #b89343;
+  --primary-light: #F3D89B;
+  --accent: #D9B15C;
 
-  --bg-page:    #020817;
+  --bg-page:    #0B0D1C;
   --bg-card:    #0d1526;
   --bg-card2:   #111827;
-  --bg-header:  rgba(2, 8, 23, 0.96);
-  --bg-nav:     rgba(2, 8, 23, 0.96);
-  --bg-section: linear-gradient(145deg, #0b1628 0%, #060f1e 100%);
+  --bg-header:  #0B0D1C;
+  --bg-nav:     #0B0D1C;
+  --bg-section: linear-gradient(160deg, rgba(58,74,142,0.38) 0%, rgba(27,35,64,0.60) 100%);
   --bg-input:   rgba(255,255,255,0.05);
 
   --glass:        rgba(255,255,255,0.04);
-  --glass-border: rgba(255,255,255,0.08);
+  --glass-border: rgba(217,177,92,0.30);
   --glass-hover:  rgba(255,255,255,0.07);
 
-  --card-border:  rgba(14,165,233,0.12);
-  --card-bg:      linear-gradient(145deg,rgba(14,165,233,0.08) 0%,rgba(99,102,241,0.05) 100%);
+  --card-border:  rgba(217,177,92,0.30);
+  --card-bg:      linear-gradient(160deg, rgba(58,74,142,0.38) 0%, rgba(27,35,64,0.60) 100%);
 
-  --text-primary:   #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted:     #475569;
+  --text-primary:   #F5F6FA;
+  --text-secondary: #8A8FA3;
+  --text-muted:     #6B7290;
   --text-heading:   #ffffff;
 
   --success: #10b981;
   --warning: #f59e0b;
   --danger:  #ef4444;
 
-  --title-gradient: linear-gradient(135deg,#ffffff 0%,#bae6fd 100%);
-  --header-border:  rgba(14,165,233,0.12);
-  --nav-indicator:  rgba(14,165,233,0.15);
-  --btn-expand-bg:  linear-gradient(135deg,rgba(14,165,233,0.12) 0%,rgba(99,102,241,0.12) 100%);
-  --btn-expand-border: rgba(14,165,233,0.25);
-  --btn-expand-color:  #38bdf8;
+  --title-gradient: linear-gradient(135deg,#ffffff 0%,#F3D89B 100%);
+  --header-border:  rgba(217,177,92,0.18);
+  --nav-indicator:  rgba(217,177,92,0.15);
+  --btn-expand-bg:  linear-gradient(135deg,#F3D89B 0%,#D9B15C 100%);
+  --btn-expand-border: rgba(255,255,255,0.25);
+  --btn-expand-color:  #1B2340;
 }
 
 /* ═══ LIGHT THEME ═══ */
@@ -354,15 +354,95 @@ body {
   }
 }
 
+@keyframes holoRingRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes radarSweep {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes beaconPulse {
+  0%, 100% {
+    transform: scale(0.85);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes drawerSlideUp {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+@keyframes zoomInModal {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+
+@keyframes qrLaserScan {
+  0% {
+    transform: translateY(0px);
+    opacity: 0.25;
+  }
+  50% {
+    transform: translateY(52px);
+    opacity: 0.90;
+  }
+  100% {
+    transform: translateY(0px);
+    opacity: 0.25;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ambient-orb,
+  .ambient-flow-dash,
   [style*="ambientOrbFloat"],
   [style*="flightFlowDash"],
   [style*="flagWindWave"],
   [style*="flagSunSheen"],
-  [style*="ambientBreathe"] {
+  [style*="ambientBreathe"],
+  [style*="holoRingRotate"],
+  [style*="radarSweep"],
+  [style*="beaconPulse"],
+  [style*="qrLaserScan"] {
     animation: none !important;
   }
 }
+
 
 
